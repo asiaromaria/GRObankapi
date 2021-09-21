@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { User, validateUser } = require('../models/account');
+const bcrypt = require('bcrypt');
+const auth = require('../middleware/auth');
 
 
 router.get('/', async (req, res) => {
@@ -15,36 +17,30 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        // const { error } = validateUser(req.body);
-        // if (error) return res.status(400).send(error.details[0].message);
-        // // let user = await User.findOne({ email: req.body.email });
-        // if (user) return res.status(400).send('User already registered.');
-        // const salt = await bcrypt.genSalt(10);
+        const { error } = validateUser(req.body);
+        if (error) return res.status(400).send(error.details[0].message);
+        let user = await User.findOne({ email: req.body.email });
+        if (user) return res.status(400).send('User already registered.');
+        const salt = await bcrypt.genSalt(10);
 
-            // user = new User({
-            // name: req.body.name,
-            // email: req.body.email,
-            // password: req.body.password,
-            // password: await bcrypt.hash(req.body.password, salt),
-            // isAdmin: req.body.isAdmin,
-        const user = new User({
+            user = new User({
             name: req.body.name,
             email: req.body.email,
-            password: req.body.password,
+            password: await bcrypt.hash(req.body.password, salt),
+            isAdmin: req.body.isAdmin,
         });
         await user.save();
-        // const token = user.generateAuthToken();
+        const token = user.generateAuthToken();
         return res
-        .send(user);
-        // .header('x-auth-token', token)
-        // .header('access-control-expose-headers', 'x-auth-token')
-        // .send({ _id: user._id, name: user.name, email: user.email });
+        .header('x-auth-token', token)
+        .header('access-control-expose-headers', 'x-auth-token')
+        .send({ _id: user._id, name: user.name, email: user.email });
     }   catch (ex) {
         return res.status(500).send(`Internal Server Error: ${ex}`);
     }
 });
 
-router.put('/:userId', async (req, res) => {
+router.put('/:userId', auth, async (req, res) => {
     try {
         const { error } = validateUser(req.body);
         if (error) return res.status(400).send(error);
@@ -57,7 +53,11 @@ router.put('/:userId', async (req, res) => {
         user.password = req.body.password;
 
         await user.save();
-        return res.send(user);
+        const token = user.generateAuthToken();
+        return res
+        .header('x-auth-token', token)
+        .header('access-control-expose-headers', 'x-auth-token')
+        .send({ _id: user._id, name: user.name, email: user.email });
     }   catch (ex) {
         return res.status(500).send(`Internal Server Error: ${ex}`);
     }
