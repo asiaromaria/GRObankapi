@@ -9,7 +9,7 @@ connectDB();
 
 app.use(cors());
 app.use(express.json()); 
-app.use('api/accounts', accounts)
+app.use('/api/accounts', accounts)
 
 
 

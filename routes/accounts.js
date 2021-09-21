@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { User, validateUser, userSchema } = require('../models/account');
+const { User, validateUser } = require('../models/account');
 
 
 router.get('/', async (req, res) => {
