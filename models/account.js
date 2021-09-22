@@ -2,6 +2,7 @@ const  mongoose  =  require('mongoose');
 const Joi = require('joi');
 const config = require('config');
 const jwt = require('jsonwebtoken');
+const { balance, balanceSchema } = require('../models/balance');
 
 
  const  userSchema  =  new  mongoose.Schema({ 
@@ -9,6 +10,7 @@ const jwt = require('jsonwebtoken');
     email: { type: String, unique: true, required: true, minlength: 5, maxlength: 255 },
     password: { type: String, required: true, minlength: 5, maxlength: 1024 },
     isAdmin: { type: Boolean, default: false},
+    balance: []
     }); 
 
     userSchema.methods.generateAuthToken = function () {
@@ -21,6 +23,7 @@ const jwt = require('jsonwebtoken');
             name: Joi.string().min(5).max(50).required(),
             email: Joi.string().min(5).max(255).required().email(),
             password: Joi.string().min(5).max(1024).required(),
+            balance: Joi.array(),
         });
         return schema.validate(user);
     }

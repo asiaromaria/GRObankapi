@@ -28,6 +28,25 @@ router.post('/', async (req, res) => {
             email: req.body.email,
             password: await bcrypt.hash(req.body.password, salt),
             isAdmin: req.body.isAdmin,
+            balance: "$1256.34",
+            transactions: [ 
+                {
+                    transaction: "Taco Bell",
+                    transAmount: "$8.34",
+                },
+                {
+                    transaction: "Spotify",
+                    transAmount: "$9.99", 
+                },
+                {
+                    transaction: "Applebees",
+                    transAmount: "$29.35", 
+                },
+                {
+                    transaction: "Target",
+                    transAmount: "$47.94", 
+                }
+            ],
         });
         await user.save();
         const token = user.generateAuthToken();
