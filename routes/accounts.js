@@ -85,6 +85,17 @@ router.put('/:userId', auth, async (req, res) => {
 });
 
 //savingsPlan
+
+router.get('/savingsplan', [auth], async (req, res) => {
+    try {
+        const savings = await SavingsPlan.find();
+        return res.send(savings);
+    }   catch (ex) {
+        return res.status(500).send(`Internal Server Error: ${ex}`);
+    };
+})
+
+
 router.post('/savingsplan', [auth], async (req, res) => {
     try{
         // validate the body to confirm it matches our desired structure for a savings plan
@@ -106,7 +117,6 @@ router.post('/savingsplan', [auth], async (req, res) => {
         user.savingsPlanSettings = savings;
         await user.save();
         return res.status(201).send(user);
-    return res.send(user);
     } catch (ex) {
         return res.status(500).send(`Internal Server Error: ${ex}`);
       }
@@ -118,22 +128,32 @@ router.post('/savingsplan', [auth], async (req, res) => {
     // Return 200 status code as well as the user
 
 
-// router.put('/savingsPlan', [auth], async (req, res) => {
-//     try{
-//         const user = await User.findById(req.user._id);
-//         if(!user){
-//             return res.status(400).send(`The user with id "${req.params.userId}" does not exist.`);
-//         };
-//         const savingsIndex = user.savingsPlanSettings.findIndex((savings) => savings._id == req.params.savingsId)
-//         if (savingsIndex== -1)
-//         return res.status(400).send(`The savings plan with id "${req.params.savingsId}" does not exist.`);
-//         const { error } = validateSave(req.body);
-//         if (error) return res.status(400).send(error.details[0].message);
+router.put('/savingsPlan/:savingsId', [auth], async (req, res) => {
+    try{
+        const { error } = validateSave(req.body);
+        if (error) return res.status(401).send(error.details[0].message)
 
-//         const savings = await SavingsPlan.findByIdAndUpdate(
-//             req.params.savingsId
-//         )
-//     }
-// })
+
+        const user = await User.findById(req.user._id);
+        if(!user){
+            return res.status(400).send(`The user with id "${req.params.userId}" does not exist.`);
+        };
+        
+        
+        const savings = await SavingsPlan.findByIdAndUpdate(
+            req.params.savingsId,
+            {
+                amount: req.body.amount,
+                monthDayOfDeposit: req.body.monthDayOfDeposit,
+                paymentType: req.body.paymentType
+            },
+            { new: true }
+        );
+        await user.save();
+        return res.status(201).send(user.savingsPlanSettings);
+    }   catch (ex) {
+        return res.status(500).send(`Internal Server Error: ${ex}`);
+      }
+});
 
 module.exports = router;
