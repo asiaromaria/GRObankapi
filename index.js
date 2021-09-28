@@ -5,7 +5,6 @@ const cors = require('cors');
 
 const accounts = require('./routes/accounts');
 const auth = require('./routes/auth');
-const balances = require('./routes/balances');
 
 connectDB();
 
@@ -13,7 +12,6 @@ app.use(cors());
 app.use(express.json()); 
 app.use('/api/auth', auth)
 app.use('/api/accounts', accounts)
-app.use('/api/balance', balances)
 
 
 
