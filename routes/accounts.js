@@ -15,6 +15,17 @@ router.get('/', async (req, res) => {
 });
 
 
+router.get('/:userId', auth, async (req, res) => {
+    try {
+        const users = await User.findById();
+        const token = user.generateAuthToken();
+        return res.send(users);
+    }   catch (ex) {
+        return res.status(500).send(`Internal Server Error: ${ex}`);
+    }
+});
+
+
 router.post('/', async (req, res) => {
     try {
         const { error } = validateUser(req.body);
@@ -84,6 +95,23 @@ router.put('/:userId', auth, async (req, res) => {
     }
 });
 
+router.delete('/:userId', [auth], async (req, res) => {
+    try {
+        const { error } = validateUser(req.body);
+        const user = await User.findByIdAndDelete(req.params.userId);
+        if (!user) return res.status(400).send(`The user with id "${req.params.userId}" does not exist.`);
+        await user.delete();
+        const token = user.generateAuthToken();
+        return res
+        .header('x-auth-token', token)
+        .header('access-control-expose-headers', 'x-auth-token')
+        .send({ _id: user._id, name: user.name, email: user.email })
+    } catch (error) {
+        
+    }
+})
+
+
 //savingsPlan
 
 router.get('/savingsplan', [auth], async (req, res) => {
@@ -140,7 +168,7 @@ router.put('/savingsPlan/:savingsId', [auth], async (req, res) => {
         };
         
         
-        const savings = await SavingsPlan.findByIdAndUpdate(
+        const savings = await User.findByIdAndUpdate(
             req.params.savingsId,
             {
                 amount: req.body.amount,
@@ -150,7 +178,7 @@ router.put('/savingsPlan/:savingsId', [auth], async (req, res) => {
             { new: true }
         );
         await user.save();
-        return res.status(201).send(user.savingsPlanSettings);
+        return res.status(201).send(user);
     }   catch (ex) {
         return res.status(500).send(`Internal Server Error: ${ex}`);
       }
