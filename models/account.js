@@ -13,6 +13,7 @@ const { number } = require('joi');
     const savingsPlanSchema = new mongoose.Schema({
         amount: {type: Number, required: true },
         monthDayOfDeposit: {type: Number, required: true },
+        additonalAmount: {type: Number, required: true },
         paymentType: { type: String, required: true}
     })
 
@@ -29,6 +30,7 @@ const { number } = require('joi');
         loans: {type: number, required: true },
         retailCards: {type: number, required: true },
         mortgageLoans: {type: number, required: true },
+        recentCreditLines: {type: number, required: true },
         dob: {type: Date, required: true },
         isAdmin: { type: Boolean, default: false},
         savingsPlanSettings: {type: savingsPlanSchema },
@@ -50,6 +52,7 @@ const { number } = require('joi');
         const schema = Joi.object({
             amount: Joi.number(),
             monthDayOfDeposit: Joi.number(),
+            additonalAmount: Joi.number(),
             paymentType: Joi.string().min(5).max(50).required(),
         });
         return schema.validate(savings);
@@ -77,6 +80,7 @@ const { number } = require('joi');
             loans: Joi.number(),
             retailCards: Joi.number(),
             mortgageLoans: Joi.number(),
+            recentCreditLines: Joi.number(),
             dob: Joi.date(),
         });
         return schema.validate(user);
