@@ -38,28 +38,19 @@ router.post('/', async (req, res) => {
             name: req.body.name,
             email: req.body.email,
             password: await bcrypt.hash(req.body.password, salt),
-            ssn: req.body.ssn,
+            paymentsToGro: req.body.paymentsToGro,
+            creditScoreHistory: req.body.creditScoreHistory,
+            paymentHistory: req.body.paymentHistory,
+            accountsOwed: req.body.accountsOwed,
+            lengthOfCredit: req.body.lengthOfCredit,
+            creditCards: req.body.creditCards,
+            loans: req.body.loans,
+            retailCards: req.body.retailCards,
+            mortgageLoans: req.body.mortgageLoans,
+            recentCreditLines: req.body.recentCreditLines,
             dob: req.body.dob,
             isAdmin: req.body.isAdmin,
-            // balance: "$1256.34",
-            // transactions: [ 
-            //     {
-            //         transaction: "Taco Bell",
-            //         transAmount: "$8.34",
-            //     },
-            //     {
-            //         transaction: "Spotify",
-            //         transAmount: "$9.99", 
-            //     },
-            //     {
-            //         transaction: "Applebees",
-            //         transAmount: "$29.35", 
-            //     },
-            //     {
-            //         transaction: "Target",
-            //         transAmount: "$47.94", 
-            //     }
-            // ],
+            
         });
         await user.save();
         const token = user.generateAuthToken();
@@ -139,6 +130,7 @@ router.post('/savingsplan', [auth], async (req, res) => {
         const savings = new SavingsPlan({
         amount: req.body.amount,
         monthDayOfDeposit: req.body.monthDayOfDeposit,
+        additonalAmount: req.body.additonalAmount,
         paymentType: req.body.paymentType,
         });
 
@@ -173,6 +165,7 @@ router.put('/savingsPlan/:savingsId', [auth], async (req, res) => {
             {
                 amount: req.body.amount,
                 monthDayOfDeposit: req.body.monthDayOfDeposit,
+                additonalAmount: req.body.additonalAmount,
                 paymentType: req.body.paymentType
             },
             { new: true }
