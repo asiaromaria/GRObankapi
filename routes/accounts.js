@@ -38,8 +38,8 @@ router.post('/', async (req, res) => {
             name: req.body.name,
             email: req.body.email,
             password: await bcrypt.hash(req.body.password, salt),
-            paymentsToGro: req.body.paymentsToGro,
-            creditScoreHistory: req.body.creditScoreHistory,
+            paymentsToGro: [],
+            creditScoreHistory: [],
             paymentHistory: req.body.paymentHistory,
             accountsOwed: req.body.accountsOwed,
             lengthOfCredit: req.body.lengthOfCredit,
@@ -86,17 +86,17 @@ router.put('/:userId', auth, async (req, res) => {
     }
 });
 
-router.delete('/:userId', [auth], async (req, res) => {
+router.delete('/', [auth], async (req, res) => {
     try {
         const { error } = validateUser(req.body);
-        const user = await User.findByIdAndDelete(req.params.userId);
-        if (!user) return res.status(400).send(`The user with id "${req.params.userId}" does not exist.`);
+        const user = await User.findByAndDelete(req.params.email);
+        if (!user) return res.status(400).send(`The user with id "${req.params.email}" does not exist.`);
         await user.delete();
         const token = user.generateAuthToken();
         return res
         .header('x-auth-token', token)
         .header('access-control-expose-headers', 'x-auth-token')
-        .send({ _id: user._id, name: user.name, email: user.email })
+        .send(token)
     } catch (error) {
         
     }
