@@ -86,19 +86,20 @@ router.put('/:userId', auth, async (req, res) => {
     }
 });
 
-router.delete('/', [auth], async (req, res) => {
+router.delete('/:userId', [auth], async (req, res) => {
     try {
         const { error } = validateUser(req.body);
-        const user = await User.findByAndDelete(req.params.email);
-        if (!user) return res.status(400).send(`The user with id "${req.params.email}" does not exist.`);
+        const user = await User.findByIdAndDelete(req.params.userId);
+        if (!user) return res.status(400).send(`The user with id "${req.params.userId}" does not exist.`);
         await user.delete();
         const token = user.generateAuthToken();
         return res
         .header('x-auth-token', token)
         .header('access-control-expose-headers', 'x-auth-token')
-        .send(token)
+        .send({ _id: user._id, name: user.name, email: user.email });
     } catch (error) {
-        
+        return res.status(500).send(`Internal Server Error: ${ex}`);
+ 
     }
 })
 
