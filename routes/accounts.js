@@ -26,7 +26,7 @@ router.get('/:userId', auth, async (req, res) => {
 });
 
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     try {
         const { error } = validateUser(req.body);
         if (error) return res.status(400).send(error.details[0].message);
@@ -38,16 +38,16 @@ router.post('/', async (req, res) => {
             name: req.body.name,
             email: req.body.email,
             password: await bcrypt.hash(req.body.password, salt),
-            paymentsToGro: [],
-            creditScoreHistory: [],
-            paymentHistory: req.body.paymentHistory,
-            accountsOwed: req.body.accountsOwed,
-            lengthOfCredit: req.body.lengthOfCredit,
-            creditCards: req.body.creditCards,
-            loans: req.body.loans,
-            retailCards: req.body.retailCards,
-            mortgageLoans: req.body.mortgageLoans,
-            recentCreditLines: req.body.recentCreditLines,
+            // paymentsToGro: [],
+            // creditScoreHistory: [],
+            // paymentHistory: req.body.paymentHistory,
+            // accountsOwed: req.body.accountsOwed,
+            // lengthOfCredit: req.body.lengthOfCredit,
+            // creditCards: req.body.creditCards,
+            // loans: req.body.loans,
+            // retailCards: req.body.retailCards,
+            // mortgageLoans: req.body.mortgageLoans,
+            // recentCreditLines: req.body.recentCreditLines,
             dob: req.body.dob,
             isAdmin: req.body.isAdmin,
             
@@ -63,17 +63,19 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.put('/:userId', auth, async (req, res) => {
+router.put('/', auth, async (req, res) => {
     try {
         const { error } = validateUser(req.body);
         if (error) return res.status(400).send(error);
 
-        const user = await User.findByIdAndUpdate(req.params.userId);
-        if (!user) return res.status(400).send(`The user with id "${req.params.userId}" does not exist.`);
+        const user = await User(req.params.user);
+        if (!user) return res.status(400).send(`The user with id "${req.params.user}" does not exist.`);
 
         user.name = req.body.name;
         user.email = req.body.email;
         user.password = req.body.password;
+        
+
 
         await user.save();
         const token = user.generateAuthToken();
@@ -86,7 +88,7 @@ router.put('/:userId', auth, async (req, res) => {
     }
 });
 
-router.delete('/:userId', [auth], async (req, res) => {
+router.delete('/:userId', auth, async (req, res) => {
     try {
         const { error } = validateUser(req.body);
         const user = await User.findByIdAndDelete(req.params.userId);
